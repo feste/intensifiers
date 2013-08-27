@@ -725,7 +725,7 @@ function classifyResponse(noun, n, startTime, morphProp, order) {
                                    "rt":rt,
                                    "response":noun,
                                    "correctness":"N/A",
-                                   "morphProp(s)":morphProp,
+                                   "morphProps":morphProp,
                                    "order":order});
   warmupNext(n);
 }
