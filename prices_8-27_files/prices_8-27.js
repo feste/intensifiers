@@ -172,16 +172,15 @@ var experiment = {
 		  } else {
 			  $("#continue").unbind("click");
 			  $('input[name=rating]').attr('checked',false);
+        var response = responseRaw.split("=")[1];
+        experiment.data.questions.push({
+          qNumber:qNumber,
+          qType:qType,
+          dollarAmt:dollarAmt,
+          sigs:sigs,
+          item:item,
+          response:response});
         if (qNumber + 1 < nQs) {
-          var response = responseRaw.split("=")[1];
-          console.log(response);
-          experiment.data.questions.push({
-            qNumber:qNumber,
-            qType:qType,
-            dollarAmt:dollarAmt,
-            sigs:sigs,
-            item:item,
-            response:response});
           experiment.trial(qNumber+1);
         } else {
           experiment.questionaire();
