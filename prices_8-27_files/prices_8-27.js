@@ -10,7 +10,7 @@ function sd(arr) {
 // 48 questions
 // an X that costs value is expensive
 // an X that costs epsilon less than an expensive X is expensive
-var epsilonDeviations = [0.01, 0.1, 0.5, 0.1];
+var epsilonDeviations = [0.01, 0.1, 0.5, 1];
 var valueDeviations = [0, 1, 2, 3];
 var items = ["headphones", "sweater", "laptop", "coffee maker", "watch"];
 var nEps = epsilonDeviations.length;
