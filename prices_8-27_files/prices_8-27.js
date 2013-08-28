@@ -68,7 +68,7 @@ var values = shuffle(unshuffledVals);
 var qTypes = shuffle(unshuffledQTypes);
 
 var unshuffledItemBank = [];
-while (length(unshuffledItemBank) < nQs) {
+while (unshuffledItemBank.length < nQs) {
   unshuffledItemBank = unshuffledItemBank.concat(items);
 }
 var itemBank = shuffle(unshuffledItemBank);
@@ -124,6 +124,7 @@ var experiment = {
   },
   
   trial: function(qNumber) {
+    var startTime = Date.now();
     $("#trialerror").hide();
     showSlide("trial");
     var item = itemBank.shift();
@@ -157,19 +158,22 @@ var experiment = {
     $('.bar').css('width', ( 100*qNumber/nQs + "%"));
     $("#continue").click(function() {
       var responseRaw = $("#form").serialize();
-		  if (responseRaw.length < 8) {
-			  $("#trialerror").show();
-		  } else {
-			  $("#continue").unbind("click");
-			  $('input[name=rating]').attr('checked',false);
+      if (responseRaw.length < 8) {
+        $("#trialerror").show();
+      } else {
+        $("#continue").unbind("click");
+        $('input[name=rating]').attr('checked',false);
+        var endTime = Date.now();
         var response = responseRaw.split("=")[1];
+        var rt = endTime - startTime;
         experiment.data.questions.push({
           qNumber:qNumber,
           qType:qType,
           dollarAmt:dollarAmt,
           sigs:sigs,
           item:item,
-          response:response});
+          response:response,
+          rt:rt});
         if (qNumber + 1 < nQs) {
           experiment.trial(qNumber+1);
         } else {
