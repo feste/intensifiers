@@ -1,10 +1,9 @@
-// artifact vs. natural kinds? (probably not a problem)
-// fix morph shapes
+//DAMMIT! I used 0.8 for the "obvious" classification trial
+//instead of 0.08. T_T
+
+//also, we should color the target shapes.
+
 // find out whether we can accurately log window size inside mturk
-// could have Ss click button to make array visible
-// don't let the hit expire!!!
-// make peakedMid centered at 0.5
-// should each category have a shape close to each endpoint?
 
 
 /*
