@@ -10,14 +10,15 @@ function sd(arr) {
 // 48 questions
 // an X that costs value is expensive
 // an X that costs epsilon less than an expensive X is expensive
-var epsilonDeviations = [0.01, 0.1, 0.5, 1];
-var valueDeviations = [0, 1, 2, 3];
+var epsilonDeviations = [0.01, 0.1, 0.5, 1, 2, 3];
+var valueDeviations = [0, 1, 2, 3, 4];
 var items = ["headphones", "sweater", "laptop", "coffee maker", "watch"];
 var nEps = epsilonDeviations.length;
 var nVals = valueDeviations.length;
 var nItems = items.length;
-var nQsPerItem = nEps + nVals;
-var nQs = nQsPerItem * nItems;
+var nQsPerCond = 4;
+var nConds = nEps + nVals;
+var nQs = nQsPerCond * nConds;
 
 function getEps(item, sigs) {
   if(humanPriors[item] == null) {console.log("ERROR 2");}
@@ -47,41 +48,30 @@ function fancyRound(rawPrice) {
   return "$" + roundPrice;
 }
 
-//make a map from items to shuffled epsilons
-var epsilons = {}
-for (var i=0; i<nItems; i++) {
-  var item = items[i];
-  epsilons[item] = shuffle(epsilonDeviations);
-}
-
-//make a map from items to shuffled values
-var values = {}
-for (var i=0; i<nItems; i++) {
-  var item = items[i];
-  values[item] = shuffle(valueDeviations);
-}
-
-//make a map from items to order of presentation of epsilon/value questions
-var orders = {}
-for (var i=0; i<nItems; i++) {
-  var item = items[i];
-  var unshuffledOrd = [];
+var unshuffledQTypes = [];
+var unshuffledEps = [];
+for (var i=0; i<nQsPerCond; i++) {
+  unshuffledEps = unshuffledEps.concat(epsilonDeviations);
   for (var j=0; j<nEps; j++) {
-    unshuffledOrd.push("eps");
+    unshuffledQTypes.push("eps");
   }
+}
+var epsilons = shuffle(unshuffledEps);
+var unshuffledVals = [];
+for (var i=0; i<nQsPerCond; i++) {
+  unshuffledVals = unshuffledVals.concat(valueDeviations);
   for (var j=0; j<nVals; j++) {
-    unshuffledOrd.push("val");
+    unshuffledQTypes.push("val");
   }
-  orders[item] = shuffle(unshuffledOrd);
 }
+var values = shuffle(unshuffledVals);
+var qTypes = shuffle(unshuffledQTypes);
 
-var trialItems = [];
-for (var i=0; i<nQsPerItem; i++) {
-  trialItems = trialItems.concat(items);
+var unshuffledItemBank = [];
+while (length(unshuffledItemBank) < nQs) {
+  unshuffledItemBank = unshuffledItemBank.concat(items);
 }
-var shuffledItems = shuffle(trialItems);
-
-if (!(trialItems.length == nQs)) {console.log("Error 5");}
+var itemBank = shuffle(unshuffledItemBank);
 
 function caps(a) {return a.substring(0,1).toUpperCase() + a.substring(1,a.length);}
 function uniform(a, b) { return ( (Math.random()*(b-a))+a ); }
@@ -136,10 +126,10 @@ var experiment = {
   trial: function(qNumber) {
     $("#trialerror").hide();
     showSlide("trial");
-    var item = shuffledItems[qNumber];
-    var qType = orders[item].shift();
+    var item = itemBank.shift();
+    var qType = qTypes.shift();
     if (qType == "val") {
-      var sigs = values[item].shift();
+      var sigs = values.shift();
       var dollarAmt = getVal(item, sigs);
       if (sg(item)) {
         var statement = "<b>" + caps(article(item)) + " " + item + " that costs " +
@@ -149,7 +139,7 @@ var experiment = {
                         " are expensive.</b>";
       }
     } else if (qType == "eps") {
-      var sigs = epsilons[item].shift();
+      var sigs = epsilons.shift();
       var dollarAmt = getEps(item, sigs);
       if (sg(item)) {
         var statement = "<b>" + caps(article(item)) + " " + item + " that costs " +
