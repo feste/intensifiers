@@ -497,7 +497,8 @@ var experiment = {
         console.log("error 79");
       }
     }
-    var targetPhrases = shuffle(targetPhrases);
+    var targetNounOrder = shuffle([0,1]);
+    var targetPhrases = targetNounOrder.map(function(i) {return targetPhrases[i];})
     
     function row(index) {
       return Math.floor(index / 3);
@@ -522,7 +523,7 @@ var experiment = {
      } else {
        console.log("error 78");
      }
-     shapes[i].attr({fill: makeGradient("r", darken(colors[artifactNumber].mean, 0.2))});
+     shapes[i].attr({fill: makeGradient("r", darken(colors[targetNounOrder[artifactNumber]].mean, 0.2))});
     }
     function animCreator(index) {
      return function(x) {
