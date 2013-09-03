@@ -190,8 +190,7 @@ var nounify = { "feppy": "feppiness",
                 "blicky": "blickiness",
                 "speffy": "speffines",
                 "zibby": "zibbiness",
-                "gubby": "gubbiness",
-                "borty": "bortiness" };
+                "gubby": "gubbiness"}
 var adjify = { "fep": "feppy",
                "wug":"wuggy",
                "tig": "tiggy",
@@ -199,8 +198,7 @@ var adjify = { "fep": "feppy",
                "dax": "daxy",
                "speff": "speffy",
                "zib": "zibby",
-               "gub": "gubby",
-               "bort": "borty"};
+               "gub": "gubby"}
 var plural = { "fep": "feps",
                "wug":"wugs",
                "tig": "tigs",
@@ -208,8 +206,7 @@ var plural = { "fep": "feps",
                "dax": "daxes",
                "speff": "speffs",
                "zib": "zibs",
-               "gub": "gubs",
-               "bort": "borts" }
+               "gub": "gubs"}
 console.log(nonceWords.length == Object.keys(adjify).length);
 console.log(Object.keys(adjify).length == Object.keys(nounify).length);
 console.log(Object.keys(nounify).length == Object.keys(plural).length);
