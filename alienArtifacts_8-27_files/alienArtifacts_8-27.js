@@ -16,6 +16,15 @@ var expertNames = ["John", "David", "Sam", "Jason", "Steve", "Lawrence", "Colin"
                    "Sally", "Megan", "Tanya", "Elizabeth", "Mary", "Katy", "Laura"];
 var expertName = shuffle(expertNames)[0];
 
+function expertPron(person) {
+  if (person == "John" || person == "David" || person == "Sam" || person == "Jason" ||
+      person == "Steve" || person == "Lawrence" || person == "Colin") {
+    return("he"); {
+  else {
+    return("she");
+  }
+}
+
 // creates an image partway between two other images, as in the animations
 // by Raphael.js
 function intermediate(from, to, pos) {
@@ -461,12 +470,12 @@ var experiment = {
       */
       var prompt = "<p>" + expertName + " is an expert on these alien " +
                    "artifacts.</p><p>For each of the phrases below, imagine " +
-                   " that " + expertName + " sees an object which he knows is " +
-                   "from that category" +
+                   " that " + expertName + " sees an object which " +
+                   expertPron(expertName) + " knows is from that category" +
                    " and describes it using that phrase. What do you think " +
                    "each object looks like? Adjust the slider to give us your" +
                    " guess.</p>";
-      var targetBegin = 'John says, "';
+      var targetBegin = expertName + ' says, "';
       var targetEnd = '"';
     } else if (experiment.cond == 'non-speech-act') {
       var prompt = "Please use the sliders below each of the phrases to indicate...";
