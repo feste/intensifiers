@@ -1,4 +1,3 @@
-//also, we should color the target shapes.
 // find out whether we can accurately log window size inside mturk
 
 
@@ -487,11 +486,16 @@ var experiment = {
     //randomize target phrase order
     var targetPhrases = [ [], [] ];
     var phrasesOrder = shuffle([0,1,2]);
+    var nounsBy = "row";
     for (var i=0; i<nouns.length; i++) {
-      //if need to switch rows and columns, do that here by switching i and phrasesOrder[#]
-      targetPhrases[i][phrasesOrder[0]] = nouns[i];
-      targetPhrases[i][phrasesOrder[1]] = adjective + " " + nouns[i];
-      targetPhrases[i][phrasesOrder[2]] = "very " + adjective + " " + nouns[i];
+      if (nounsBy == "row") {
+        //if need to switch rows and columns, do that here by switching i and phrasesOrder[#]
+        targetPhrases[i][phrasesOrder[0]] = nouns[i];
+        targetPhrases[i][phrasesOrder[1]] = adjective + " " + nouns[i];
+        targetPhrases[i][phrasesOrder[2]] = "very " + adjective + " " + nouns[i];
+      } else {
+        console.log("error 79");
+      }
     }
     var targetPhrases = shuffle(targetPhrases);
     
@@ -509,19 +513,22 @@ var experiment = {
     var shapes = [];
     var responses = {"targetOrder":phrasesOrder};
     var nResponses = 0;
-    var firstPath = posify(intermediate(least,
-                                       most, 0.5),
-                          30, 50);
+    var firstPath = posify(intermediate(least, most, 0.5), 30, 50);
     for (var i=0; i<nTargets; i++) {
      var paper = Raphael("canvas"+i, 70, 100);
      shapes.push(paper.path(firstPath));
+     if (nounsBy == "row") {
+       var artifactNumber = row(i);
+     } else {
+       console.log("error 78");
+     }
+     shapes[i].attr({fill: makeGradient("r", darken(colors[artifactNumber].mean, 0.2))});
     }
     function animCreator(index) {
      return function(x) {
        var currentPath = posify(intermediate(least, most, x), 30, 50);
        var shape = shapes[index];
-       shape.attr({path: currentPath,
-                   fill: makeGradient("r",grey)});
+       shape.attr({path: currentPath});
      }
     }
     function callCreator(index) {
@@ -600,10 +607,22 @@ var experiment = {
 //nArtifacts should be = distributions.length
 //length of each distribution should be 20 = nExamples
 
+  function darken(origColor, eps) {
+    var eps = eps || 0.1;
+    var c = Raphael.color(origColor);
+    if (c.v - eps > 0) {
+      var value = c.v - eps;
+    } else {
+      var value = 0;
+    }
+    var newColor = Raphael.hsb2rgb(c.h, c.s, value);
+    return newColor.hex;
+  }
+
   
   function lighten(origColor, saturation) {
     var saturation = saturation || false;
-    var eps = 0.1;
+    var eps = 0.2;
     var c = Raphael.color(origColor);
     if (c.v + eps < 1) {
       var value = c.v + eps;
@@ -624,7 +643,10 @@ var experiment = {
 
   function makeGradient(intro, origColor) {
     var light = lighten(origColor);
-    var grad = intro + light + "-" + origColor;
+    var dark = darken(origColor);
+    console.log(light);
+    console.log(dark);
+    var grad = intro + light + "-" + dark;
     return grad;
   }
   
