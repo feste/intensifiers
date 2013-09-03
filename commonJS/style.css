@@ -141,6 +141,14 @@ form {
 .dragdealer .disabled {
 	background: #898989;
 }
+.dragdealer .grey-bar {
+        width: 30px;
+        height: 30px;
+        background: #666666;
+        color: #FFF;
+        line-height: 30px;
+        text-align: center;
+}
 
 
 /* prog bar */

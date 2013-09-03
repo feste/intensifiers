@@ -551,7 +551,7 @@ var experiment = {
      var sliderLabel = "slider" + i;
      $("#"+caseLabel).html('<div id="'+sliderLabel+
                            '" class="dragdealer"><div class='+
-                           '"red-bar handle"></div></div>');
+                           '"grey-bar handle"></div></div>');
      var slider = new Dragdealer(sliderLabel, {
        x: 0.5,
        speed: 50,
