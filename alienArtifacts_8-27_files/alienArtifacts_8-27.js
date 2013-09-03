@@ -1,4 +1,3 @@
-//also, fix the names
 //also, we should color the target shapes.
 // find out whether we can accurately log window size inside mturk
 
