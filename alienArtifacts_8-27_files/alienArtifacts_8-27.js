@@ -19,8 +19,8 @@ var expertName = shuffle(expertNames)[0];
 function expertPron(person) {
   if (person == "John" || person == "David" || person == "Sam" || person == "Jason" ||
       person == "Steve" || person == "Lawrence" || person == "Colin") {
-    return("he"); {
-  else {
+    return("he");
+  } else {
     return("she");
   }
 }
