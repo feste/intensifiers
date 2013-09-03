@@ -1,17 +1,16 @@
-//DAMMIT! I used 0.8 for the "obvious" classification trial
-//instead of 0.08. T_T
-
+//also, fix the names
 //also, we should color the target shapes.
-
 // find out whether we can accurately log window size inside mturk
 
 
 /*
 var pairings = [ ["cloud", "squashedBoomarang"], ["fat", "flower"],
                  ["spikes", "choppyCircle"], ["circleSpikes", "oblongSpikes"],
-                 ["bigCloud", "frillyCloud"], ["ghost", "s"], ["crown","cloudedMoon"] ];
+                 ["bigCloud", "frillyCloud"], ["ghost", "s"],
+                 ["crown","cloudedMoon"] ];
 */
-var pairings = [ ["crown", "cloudedMoon"], ["ghost", "s"], ["splat", "flyingSquirrel"], ["weirdPacman", "weirdHeart"]];
+var pairings = [ ["crown", "cloudedMoon"], ["ghost", "s"],
+                 ["splat", "flyingSquirrel"], ["weirdPacman", "weirdHeart"]];
 
 var expertNames = ["John", "David", "Sam", "Jason", "Steve", "Lawrence", "Colin",
                    "Sally", "Megan", "Tanya", "Elizabeth", "Mary", "Katy", "Laura"];
