@@ -248,7 +248,7 @@ warmups. points are taken from where the *kernel densities* of peakedDown and
 peakedMid intersect with each other, the higher point where peakedMid and unif
 intersect with each other, the max of peakedMid, the max of peakedDown, and
 1-max(peakedDown)*/
-var classifyParams = [0.8, 0.29, 0.52, 0.74, 0.92];
+var classifyParams = [0.08, 0.29, 0.52, 0.74, 0.92];
 
 var nComparisons = compareParams.length;//2;
 var nClassifications = classifyParams.length;//2;
