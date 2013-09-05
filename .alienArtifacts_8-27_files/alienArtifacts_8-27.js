@@ -129,6 +129,9 @@ var experiment = {
     var onScreenShapes = comparison.map(function(prop) {
       return paper.path(intermediate(shapePaths[0], shapePaths[1], prop));
     })
+    onScreenShapes.map(function(shape) {
+      shape.attr({fill:makeGradient("r", grey)});
+    })
     onScreenShapes[0].transform("T80,-90S0.3");
     onScreenShapes[1].transform("T220,-90S0.3");
     var actualDistance = Math.abs(comparison[0] - comparison[1]);
