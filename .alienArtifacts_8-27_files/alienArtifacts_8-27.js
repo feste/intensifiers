@@ -181,7 +181,8 @@ var experiment = {
     })
     onScreenShapes[0].transform("T80,-90S0.3");
     onScreenShapes[1].transform("T220,-90S0.3");
-    var actualDistance = Math.abs(comparison[0] - comparison[1]);
+    var actualDistance = Math.round(Math.abs(comparison[0]*10 -
+                                             comparison[1]*10))/10;
     $("#trialerror").hide();
     $("#continue").click(function() {
       var raw = $("form").serialize();
@@ -190,6 +191,10 @@ var experiment = {
         var endTime = Date.now();
         experiment.data.questions.push({comparison:comparison,
                                         response:response,
+                                        artifactNumber:artifactNumber,
+                                        comparisonNumber:qNumber,
+                                        qNumber:qsSoFar,
+                                        shapeNames:shapeNames,
                                         actualDistance:actualDistance,
                                         rt:endTime - startTime});
 			  $('input[name=rating]').attr('checked',false);
