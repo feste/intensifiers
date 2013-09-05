@@ -1,3 +1,50 @@
+var grey = "#e6e6e6";
+
+function darken(origColor, eps) {
+  var eps = eps || 0.1;
+  var c = Raphael.color(origColor);
+  if (c.v - eps > 0) {
+    var value = c.v - eps;
+  } else {
+    var value = 0;
+  }
+  var newColor = Raphael.hsb2rgb(c.h, c.s, value);
+  return newColor.hex;
+}
+
+
+function lighten(origColor, saturation) {
+  var saturation = saturation || false;
+  var eps = 0.2;
+  var c = Raphael.color(origColor);
+  if (c.v + eps < 1) {
+    var value = c.v + eps;
+  } else {
+    var value = 1;
+  }
+  if (saturation) {
+    var saturationEps = 0.1;
+    if (c.s - saturationEps > 0) {
+      var sat = c.s - saturationEps;
+    } else {
+      var sat = 0;
+    }
+  } else {sat = c.s;}
+  var newColor = Raphael.hsb2rgb(c.h, sat, value);
+  return newColor.hex;
+}
+
+function makeGradient(intro, origColor) {
+  var light = lighten(origColor);
+  var dark = darken(origColor);
+  console.log(light);
+  console.log(dark);
+  var grad = intro + light + "-" + dark;
+  return grad;
+}
+
+
+
 function rep(x, n) {
   newlist=[];
   for(var i=0;i<n;i++) {
