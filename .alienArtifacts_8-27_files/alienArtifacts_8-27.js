@@ -77,6 +77,13 @@ for (var i=0; i<4; i++) {
 for (var i=0; i<3; i++) {
   comparisons.push( [i*2/10, (i+3)*2/10] );
 }
+for (var i=0; i<2; i++) {
+  comparisons.push( [i*2/10, (i+4)*2/10] );
+}
+for (var i=0; i<1; i++) {
+  comparisons.push( [i*2/10, (i+5)*2/10] );
+}
+
 comparisons.map(function(x){console.log(x);});
 
 var artifactsPerSubj = 4;
