@@ -1,6 +1,5 @@
 #install.packages("rjson")
 library(rjson)
-library(rjson)
 
 rd <- read.table("intensifiers.results", sep="\t", quote='"', header=TRUE)
 
@@ -124,7 +123,7 @@ error.bar <- function(x, y, upper, lower=upper, lw=2, col="black", length=0.1,..
 getUnigrams <- function() {
   cnames <- c("word", "year", "count")
   cclass <- c("character", "numeric", "numeric")
-  unigrams.data <- read.table("intensifier1grams.sep", sep="\t", header=F, col.names=cnames, colClasses=cclass)
+  unigrams.data <- read.table("intensifier1grams.sep", sep=" ", header=F, col.names=cnames, colClasses=cclass)
   #bigrams.data <- read.table("intensifier2grams.sep", sep="\t", header=F, col.names=cn, colClasses=cc)
   
   ages <- as.numeric(sapply(as.character(rd$Answer.age), cutQuotes))
@@ -147,6 +146,8 @@ getUnigrams <- function() {
 unigram <- getUnigrams()
 unigram <- unigram[names(unigram) != "super"]
 unigram <- unigram[names(unigram) != "crazy"]
+unigram <- unigram[names(unigram) != "expensive"]
+unigram <- unigram[names(unigram) != "total"]
 
 analyze <- function(version) {
   avg.data <- aggregate(x=data[[version]],
@@ -209,166 +210,25 @@ analyze <- function(version) {
   }
   legend("topright", items, cex=0.8, col=colors, lwd=2, bty="n");
   par(new=F)
-  
-#   if (version == "price") {
-#     fit <- lm(price ~ intensifier*item, data=data)
-#     intercept <- fit$coefficients[['(Intercept)']]
-#   } else if (version == "scaled") {
-#     fit <- lm(scaled ~ intensifier*item, data=data)
-#     intercept <- fit$coefficients[['(Intercept)']]
-#   } else if (version == "subj.scaled") {
-#     fit <- lm(subj.scaled ~ intensifier*item, data=data)
-#     intercept <- fit$coefficients[['(Intercept)']]
-#   } else if (version == "z") {
-#     fit <- lm(z ~ intensifier*item, data=data)
-#     intercept <- fit$coefficients[['(Intercept)']]
-#   } else if (version == "subtract") {
-#     fit <- lm(subtract ~ intensifier*item, data=data)
-#     intercept <- fit$coefficients[['(Intercept)']]
-#   }
   all.expt <- matrix(data=all.expt, ncol=3)
   colnames(all.expt) <- col.names
   expt.means <- sapply(1:nrow(all.expt), function(i) {return(mean(all.expt[i,]))})
   print(paste(version, "mean", cor(log(unigram), expt.means)))
 }
 
-for (version in c("price", "scaled", "subj.scaled", "z", "sd")) {
-  analyze(version)
-}
-#analyze("z")
+# for (version in c("price", "scaled", "subj.scaled", "z", "sd")) {
+#   analyze(version)
+# }
 
-#   #function(expt) {
-#   
-#   
-#   expt <- expt[names(expt) != "super"]
-#   #print(avg.data$intensifier[order(avg.data$z)])
-#   
-#   # are.expt.probs <- c(0.0000824221, 0, 0.0000003831, 0.0000001396, 0.0000001054, 0.0000038713,
-#   #                    0.0000000876, 0.0000001186, 0.0000000072, 0.000004311, 0.0000002052,
-#   #                    0, 0.0000002385, 0, 0.0000000212, 0.0000172606, 0.000000043)
-#   # plain.expt.probs <- c(0.0012, 0.00043, 0.00042, 0.00038, 0.0048, 0.00012, 0.00012, 0.00002,
-#   #                      0.014, 0.016, 0.00069, 0.00054, 0.000071, 0.00038, 0.059, 0.00042)
-#   # plot(plain.expt.probs, avg.data$z[2:length(avg.data$z)])
-#   # cor(plain.expt.probs, avg.data$z[2:length(avg.data$z)])
-#   
-#   # subs <- subset(bigrams.data, bigrams.data$year > year.since)
-#   # bigram.avg.data <- aggregate(count ~ word, data=subs, FUN=sum)
-#   # 
-#   # o <- order(bigram.avg.data$word)
-#   # bigram <- bigram.avg.data$count[o]
-#   # names(bigram) <- bigram.avg.data$word[o]
-#   
-#   
-#   # expt <- expt[names(expt) != "horribly"]
-#   # expt <- expt[names(expt) != "excessively"]
-#   # expt <- expt[names(expt) != "wildly"]
-#   # expt <- expt[names(expt) != "terribly"]
-#   # bigram <- bigram[names(bigram) != "horribly expensive"]
-#   # bigram <- bigram[names(bigram) != "excessively expensive"]
-#   # bigram <- bigram[names(bigram) != "wildly expensive"]
-#   # bigram <- bigram[names(bigram) != "terribly expensive"]
-#   
-#   # plot(bigram, expt)
-#   # print(paste("bigram freq:", cor(bigram, expt)))
-#   # print(paste("log bigram freq:", cor(log(bigram), expt)))
-#
-#   # unigram <- unigram[names(unigram) != "horribly"]
-#   # unigram <- unigram[names(unigram) != "excessively"]
-#   # unigram <- unigram[names(unigram) != "wildly"]
-#   # unigram <- unigram[names(unigram) != "terribly"]
-#   
-#   
-#  # print(paste("unigram freq: ", cor(unigram, expt)))
-# #  print(paste("log unigram freq:", cor(log(unigram), expt)))
-#   
-#   # function from http://monkeysuncle.stanford.edu/?p=485
-#   error.bar <- function(x, y, upper, lower=upper, length=0.1,...){
-#     if(length(x) != length(y) | length(y) !=length(lower) | length(lower) != length(upper))
-#       stop("vectors must be same length")
-#     arrows(x, upper, x, lower, angle=90, code=3, lwd=2, length=length, ...)
-#   }
-#   
-# #   bar.expt <- sort(expt)
-# #   high <- sapply(names(bar.expt), function(word) {
-# #     return(avg.data$higher[avg.data$intensifier == word])
-# #   })
-# #   low <- sapply(names(bar.expt), function(word) {
-# #     return(avg.data$lower[avg.data$intensifier == word])
-# #   })
-#   #png("prices-outliers-excl.png", 1400, 600)
-#   #bar <- barplot(bar.expt, ylim=c(0,3000), main="Prices with Outliers Excluded")
-#   #bar <- barplot(bar.expt, ylim=c(-1.5, 1.5), main="Z-scored Prices with Outliers Excluded")
-#   #error.bar(bar, expt, high, low)
-#   #dev.off()
-# #   
-# #   lm <- lm(price ~ intensifier*item, data=data)
-# #   #lm <- lm(price ~ intensifier, data=data)
-# #   anova <- anova(lm)
-# #   #print(anova)
-# #   
-# #   colname <- function(word, item) {
-# #     return(paste(word, item))
-# #   }
-# #   
-# #   words <- as.character(unique(data$intensifier))
-# #   words <- words[words != "super"]
-# #   words <- words[words != "crazy"]
-# #   colnames <- sapply(items, function(i) {
-# #     return(sapply(words, function(w) {
-# #       return(colname(w,i))
-# #     }))
-# #   })
-# #   #colnames <- words
-# #   m <- matrix(nrow=nsubj, ncol=length(colnames), dimnames=list(subjects, colnames))
-# #   if (length(unique(items)) > 1) {
-# #     for (i in items) {
-# #       for (w in words) {
-# #         for (s in subjects) {
-# #           price <- mean(data$price[data$intensifier == w &
-# #                                    data$item == i &
-# #                                    data$subj == s])
-# #           m[s, colname(w, i)] <- price
-# #           #m[s, w] <- price
-# #         }
-# #       }
-# #     }
-# #   } else {
-# #       for (w in words) {
-# #         for (s in subjects) {
-# #           price <- mean(data$price[data$intensifier == w &
-# #                                    data$subj == s])
-# #           m[s, w] <- price
-# #         }
-# #       }
-# #   }
-# #   
-# #   col.mean <- function(mat) {
-# #     return(apply(mat, MARGIN=2, FUN=function(x){return(mean(x, na.rm=T))}))
-# #   }
-# #   
-# #   sample.cor <- replicate(100, {
-# #     sample.m <- m[sample(rownames(m)),]
-# #     first.half <- col.mean(sample.m[1:20,])
-# #     second.half <- col.mean(sample.m[21:nrow(sample.m),])
-# #     return(cor(first.half, second.half))
-# #   })
-# #   mean.cor <- mean(sample.cor)
-# #   min.cor <- min(sample.cor)
-# #   conf.cor <- quantile(sample.cor, c(0.025, 0.975))
-# #   #print(paste("split-half:", mean.cor))
-# #   unigram.cor <- cor(unigram, expt)
-# #   splithalf.cor <- mean.cor
-# #   log.unigram.cor <- cor(log(unigram), expt)
-# #   return(c(unigram.cor, splithalf.cor, log.unigram.cor))
-# # }
+# # hist(data$price[data$item == "laptop"], breaks=20)
+# # hist(human.priors$laptop, breaks=20)
+# watch <- sort(data$price[data$item == "watch"])
+# hist(watch[1: (length(watch)-3)], breaks=100)
+# hist(human.priors$watch, breaks=20)
+# coffee <- sort(data$price[data$item == "coffee maker"])
+# hist(x=coffee[1:(length(coffee)-1)], breaks=20)
+# # hist(human.priors[["coffee maker"]], breaks=20)
 # # 
-# # getCorrelation(mydata)
-# 
-# #print(getCorrelation(data[data$item == items[1],]))
-# # getCorrelation(data[data$item == items[2],])
-# # getCorrelation(data[data$item == items[3],])
-# #analyze(subset(data, data$item == "coffee maker"))
-
-expt <- aggregate(z ~ intensifier, data=data, FUN="mean")
-expt <- expt[!(expt$intensifier %in% c("super", "crazy", "")),]
-print(cor(expt$z, log(unigram)))
+# hist(human.priors[["sweater"]], breaks=20)
+# hist(human.priors[["headphones"]], breaks=100)
+# hist(human.priors[["electric kettle"]], breaks=20)

@@ -1,12 +1,7 @@
-##need to figure out how thetas work. is there one for every utterance?
-
 #install.packages("rjson")
 library(stats)
 require(logspline)
 library(rjson)
-
-surprisal.weight = 1
-length.weight = 0
 
 #for discretization:
 grid.steps = 64
@@ -28,7 +23,7 @@ possible.utterances = c('none', 'expensive', 'enormously', 'exceedingly',
                         'excessively', 'extremely', 'horribly', 'hugely',
                         'insanely', 'quite', 'really', 'terribly', 'uncommonly',
                         'vastly', 'very', 'wildly')
-#ridiculously, outrageously, awfully, ...
+#ridiculously, outrageously, awfully, absurdly, totally, really, ...
 
 getUnigrams <- function() {
   cnames <- c("word", "year", "count")
@@ -136,21 +131,18 @@ listener0 = function(utterance.idx, thetas.idx, degree.idx, pdf, cdf) {
 }
 
 speaker1 = function(thetas.idx, degree.idx, utterance.idx, alpha, pdf, cdf) {
-  
   if(is.na(S1.cache[degree.idx,thetas.idx[1],utterance.idx])) {
     cache.misses <<- cache.misses + 1
     utt.probs = array(0,dim=c(length(possible.utterances)))
     for(i in 1:length(possible.utterances)) {
       l0 = listener0(i, thetas.idx, degree.idx, pdf, cdf)
-      ##########HERE###################FIXTHIS##############
-      utt.cost = surprisal.weight*utterance.surprisal[utterance.idx] +
-                 #or is there an interaction?
-                 length.weight * utterance.length[utterance.idx]
-      utt.probs[i] <- (l0^alpha) * exp(-alpha * utt.cost)
+      ##################THIS IS THE COST FUNCTION##############
+      utt.cost = utterance.surprisal[utterance.idx]
+      #########################################################
+      utt.probs[i] <- (l0^alpha) * exp(-alpha * utt.cost) #should this be 1/l0?
     }
     S1.cache[degree.idx,thetas.idx[1],] <<- utt.probs/sum(utt.probs)
   }
-  
   return(S1.cache[degree.idx,thetas.idx[1],utterance.idx])
 }
 
@@ -174,7 +166,7 @@ listener1 = function(utterance, alpha, n.samples, step.size,
     #check bounds:
     if (any(state < 0) || any(state > 1)) {return(0)}
     degree.idx = cache.index(state[1])
-    thetas.idx = c(cache.index(state[2]))#sapply(thetas,cache.index)
+    thetas.idx = sapply(state[2:length(possible.utterances)],cache.index)#c(cache.index(state[2]))#sapply(thetas,cache.index)
     #prior for degree (thetas have unif prior):
     prior = pdf[degree.idx]
     #probbaility speaker would have said this (given state):
@@ -189,7 +181,6 @@ listener1 = function(utterance, alpha, n.samples, step.size,
   while(state.prob==0) {
     state = runif(length(possible.utterances), 0, 1) #a degree val, and a theta for all but "no-utt"
     state.prob = prob.unnormed(state)
-    print(state.prob)
   }
   samples[1,] = state
   
@@ -222,17 +213,52 @@ listener1 = function(utterance, alpha, n.samples, step.size,
   return(list(samples=samples, prop.accepted=n.proposals.accepted/(n.samples-1)))
 }
 
-model.intensifiers <- function(cat) {
+model.intensifiers <- function(cat, utt) {
   n.true.samples <- 30000 #number of samples to keep
   lag <- 5 #number of samples to skip over
   burn.in <- 10
   n.samples <- n.true.samples * lag + burn.in
   step.size <- 0.03 #note this may not be appropriate for all conditions.
-  alpha<-5
+  alpha<-1#5
   
   clear.cache()
-  samples = listener1('none', alpha=alpha, n.samples=n.samples,
+  samples = listener1(utt, alpha=alpha, n.samples=n.samples,
                       step.size=step.size, dist=cat, band.width="SJ")
+  return(samples)
 }
 
-model.intensifiers("watch")
+samples = lapply(possible.utterances, function(utterance) {
+  if (!(utterance %in% c("hugely", "insanely", "uncommonly"))) {
+    print(utterance)
+    model.intensifiers("watch", utterance)
+  }
+})
+model.responses = list()
+for (i in 1:length(samples)) {
+  degrees = samples[[i]]$samples[,"degree"]
+  utterance = possible.utterances[[i]]
+  if (!(is.null(degrees))) {
+    print(paste(utterance, mean(degrees)))
+    model.responses[utterance] = mean(degrees)
+  }
+}
+plot(log(unigrams[names(model.responses)]), model.responses)
+#utt.none = samples[[1]]$samples
+#thetas = list(expensive = mean(utt.none[,"theta.expensive"]), enormously=mean(utt.none[,"theta.enormously"]), exceedingly=mean(utt.none[,"theta.exceedingly"]), excessively=mean(utt.none[,"theta.excessively"]), extremely=mean(utt.none[,"theta.extremely"]), horribly=mean(utt.none[,"theta.horribly"]), hugely=mean(utt.none[,"theta.hugely"]), insanely=mean(utt.none[,"theta.insanely"]), quite=mean(utt.none[,"theta.quite"]), really=mean(utt.none[,"theta.really"]), terribly=mean(utt.none[,"theta.terribly"]), uncommonly=mean(utt.none[,"theta.uncommonly"]), vastly=mean(utt.none[,"theta.vastly"]), very=mean(utt.none[,"theta.very"]), wildly=mean(utt.none[,"theta.wildly"]))
+
+# items = c("watch", "laptop", "coffee maker")
+# colors = c("red", "green", "blue")
+# sapply(1:3, function(i) {
+#   item = items[i]
+#   color = colors[i]
+#   means = sapply(possible.utterances, function(utterance) {
+#     samples = model.intensifiers(item, utterance)
+#     return(mean(samples))
+#   })
+#   names(means) = possible.utterances
+#   o = order(unigram)
+#   plot(unigram[o], means[names(unigram)[o]])
+# })
+# 
+# # #scatterplot
+# # source("analyze_intensifiers.r")
