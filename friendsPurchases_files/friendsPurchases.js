@@ -39,14 +39,40 @@ function pron(w) {
     return "it";
   }
 }
-var items = ["laptop", "watch", "coffee maker", "sweater", "headphones"];
-var intensifiers = ["very", "extremely", "wildly", "really", "insanely",
+
+var nonceWords = shuffle([
+  "wug", "dax", "fep", "speff", "zib", "gub", "wost", "wock", "thog",
+  "snim", "ript", "quog", "polt", "poch", "murp", "mork", "mopt", "monx",
+  "mone", "moge", "lide", "hoff", "hisp", "hinx", "hife", "hett", "fraw",
+  "fing", "fick", "blim", "zop", "blick"
+]);
+
+//var items = ["laptop", "watch", "coffee maker", "sweater", "headphones"];
+var items = ["laptop"];
+var deintensifiers = ["kind of", "sort of", "somewhat", "slightly",
+                      "moderately", "a bit", "a tad", "NOVEL"];
+var intensifiers = [
+  "strikingly", "staggeringly", "shockingly", "profoundly", "particularly",
+  "majorly", "uberly", "unbelievably", "supremely", "remarkably",
+  "quite", "outright", "incredibly", "impossibly", "extremely",
+  "exceedingly", "especially", "downright", "completely", "awfully",
+  "amazingly", "absurdly", "abnormally", "really", "utterly",
+  "very", "seriously", "dreadfully", "thoroughly", "NOVEL"
+];/*["very", "extremely", "wildly", "really", "insanely",
                     "super", "crazy", "excessively", "enormously", "vastly",
                     "quite", "uncommonly", "horribly", "exceedingly",
-                    "hugely", "terribly", ""];
-var purchasers = getPurchasers();
-var itemsPerS = 3;
-var qsPerItem = intensifiers.length;
+                    "hugely", "terribly", "NOVEL"];*/
+var people = getPurchasers();
+var itemsPerS = 1;
+var qsPerItem = intensifiers.length + deintensifiers.length + 1; //the +1 is for the base expensive form
+var types = [];
+for (var i=0; i<intensifiers.length; i++) {
+  types.push("intensifier");
+}
+for (var i=0; i<deintensifiers.length; i++) {
+  types.push("deintensifier");
+}
+types.push("base");
 var nQs = qsPerItem*itemsPerS;
 var subjItems = items.splice(0,itemsPerS);
 var itemBank = [];
@@ -54,12 +80,14 @@ for (var i=0; i<itemsPerS; i++) {
   itemBank = itemBank.concat(rep(subjItems[i], qsPerItem));}
 var myItems = shuffle(itemBank);
 var myIntensifiers = shuffle(replist(intensifiers, itemsPerS));
-var myPurchasers = shuffle(replist(purchasers, itemsPerS));
-var myColors = shuffle(["DF0101", "31B404", "0404B4"]);
+var myDeintensifiers = shuffle(replist(deintensifiers, itemsPerS));
+var myPeople = shuffle(replist(people, itemsPerS));
+var myTypes = shuffle(replist(types, itemsPerS));
+//var myColors = shuffle(["DF0101", "31B404", "0404B4"]);
 // B404AE FF8000/FFBF00 04B4AE/088A85
-var color = {}
+/*var color = {}
 for (var i=0; i<itemsPerS; i++) {
-  color[subjItems[i]] = myColors[i];}
+  color[subjItems[i]] = myColors[i];}*/
 
 var experimentStart
 $(document).ready(function() {
@@ -69,9 +97,10 @@ $(document).ready(function() {
   experimentStart = Date.now();});
 
 var experiment = {
-  data: {items:subjItems,
-         colors:myColors,
-         questions:[],},
+  data: {//items:subjItems,
+         //colors:myColors,
+         //questions:[]
+        },
   
   instructions: function() {
     if (turk.previewMode) {
@@ -85,27 +114,59 @@ var experiment = {
     $('.bar').css('width', ( qNumber/nQs*100 + "%"));
     showSlide("trial");
     startTime = Date.now();
-    var purchaser = myPurchasers[qNumber];
+    var purchaser = myPeople.shift().name;
+    var questioner = myPeople.shift().name;
     var intensifier = myIntensifiers[qNumber];
     var item = myItems[qNumber];
-    $("#trialText").html('<p>Your friend ' + purchaser.name + ' says, "I just' +
-                         ' bought ' + article(item) + ' <b>' +
-                         '<font color="' + color[item] + '">' + item +
-                         '</b></font>. ' +
-                         caps(pron(item)) + ' ' + be(item) + ' <b>' +
-                         intensifier + ' expensive</b>."</p>' +
-                         '<p>How much do you think ' + pron(item) + ' cost?<p>');
+    var type = myTypes[qNumber];
+    var degreeAdv;
+    var isNonce = false;
+    if (type == "intensifier") {
+      degreeAdv = intensifiers.shift();
+    } else if (type == "deintensifier") {
+      degreeAdv = deintensifiers.shift();
+    } else {
+      degreeAdv = "";
+    }
+    var word
+    if (degreeAdv == "NOVEL") {
+      degreeAdv = nonceWords.shift() + "ly";
+      isNonce = true;
+    }
+    if (type == "intensifier") {
+      $("#trialText").html('<p>You hear the following conversation between your two friends.</p>'+
+                           '<p> ' + purchaser + ': I just bought ' + article(item) + ' new ' + item +
+                           '. <br/> ' + questioner + ': Cool! How much did it cost? <br/> ' +
+                           purchaser + ': <b>It was more than just expensive. It was ' +
+                           degreeAdv + ' expensive.</b></p>' +
+                           '<p>How much do you think the ' + item + ' cost?</p>');
+    } else if (type == "deintensifier") {
+      $("#trialText").html('<p>You hear the following conversation between your two friends.</p>'+
+                           '<p> ' + purchaser + ': I just bought ' + article(item) + ' new ' + item +
+                           '. <br/> ' + questioner + ': Cool! How much did it cost? <br/> ' +
+                           purchaser + ': <b>Not too much. It was only ' +
+                           degreeAdv + ' expensive.</b></p>' +
+                           '<p>How much do you think the ' + item + ' cost?</p>');
+    } else {
+      $("#trialText").html('<p>You hear the following conversation between your two friends.</p>'+
+                           '<p> ' + purchaser + ': I just bought ' + article(item) + ' new ' + item +
+                           '. <br/> ' + questioner + ': Cool! How much did it cost? <br/> ' +
+                           purchaser + ': <b>It was expensive.</b></p>' +
+                           '<p>How much do you think the ' + item + ' cost?</p>');
+    }
     $("#continue").click(function() {
       var price = $("#price").val();
       var isPrice = /^[0-9]*(\.[0-9])?[0-9]$/.test(price);
       if (isPrice) {
         endTime = Date.now();
-        experiment.data.questions.push({name:purchaser.name,
-                                        intensifier:intensifier,
-                                        item:item,
-                                        color:color[item],
-                                        price:price,
-                                        rt:endTime-startTime})
+        experiment.data["trial" + qNumber] = { purchaser:purchaser,
+                              questioner:questioner,
+                              type:type,
+                              item:item,
+                              degreeAdv:degreeAdv,
+                              isNonce:isNonce,
+                              price:price,
+                              rt:endTime-startTime };
         $("#continue").unbind("click");
         $("#price").val("");
         if (qNumber + 1 < nQs) {
@@ -142,27 +203,71 @@ var experiment = {
   }
 }
 
-function getPurchasers() {
-  var maleNames = shuffle(["James", "John", "Robert", "Michael", "William",
-                           "David", "Richard", "Charles", "Tim"]);
-  var femaleNames = shuffle(["Mary", "Patricia", "Linda", "Barbara", "Elizabeth",
-                             "Jennifer", "Maria", "Susan", "Sally"]);
-  var gender = rep("m", maleNames.length).concat(rep("f", femaleNames.length));
-  var objPron = {"m":"him", "f":"her"};
-  var subjPron = {"m":"he", "f":"she"};
-  var purchasers = [];
-  for (var i=0; i<gender.length; i++) {
-    var g = gender[i];
-    if (g == "m") {
+function getPurchasers(g) {
+  if (g == "m") {
+    var maleNames = shuffle(["Adam", "Ben", "Colin", "David", "Erik",
+                             "Felix", "Greg", "Henry", "Ian", "John",
+                             "Kyle", "Leon", "Michael", "Nick", "Owen",
+                             "Paul", "Quinn", "Rob", "Sam", "Tim",
+                             "Vince", "William", "Xander", "Zach", "Alex",
+                             "Brian", "Chris", "Danny", "Evan", "Fred",
+                             "Geoff", "Hank", "Ivan", "Jake", "Kevin",
+                             "Larence", "Mitch", "Nathan", "Oliver", "Patrick",
+                             "Quentin", "Roger", "Sean", "Thomas", "Adrian",
+                             "Billy", "Dorian", "Elliott", "George", "Harry",
+                             "Josh", "Max", "Noah", "Phil", "Rick",
+                             "Sid", "Toby", "Martin", "Aaron", "Hal",
+                             "Steve", "James", "Charles"]);
+    var objPron = "him";
+    var subjPron = "he";
+    var purchasers = [];
+    for (var i=0; i<maleNames.length; i++) {
       var purchaserName = maleNames.shift();
-    } else if (g == "f") {
-      var purchaserName = femaleNames.shift();
-    } else {
-      console.log("error1");
+      purchasers.push({name: purchaserName,
+                       obj: objPron[g],
+                       subj: subjPron[g]});
     }
-    purchasers.push({name: purchaserName,
-                     obj: objPron[g],
-                     subj: subjPron[g]});
+    return(purchasers);
+  } else {
+    var maleNames = shuffle(["Adam", "Ben", "Colin", "David", "Erik",
+                             "Felix", "Greg", "Henry", "Ian", "John",
+                             "Kyle", "Leon", "Michael", "Nick", "Owen",
+                             "Paul", "Quinn", "Rob", "Sam", "Tim",
+                             "Vince", "William", "Xander", "Zach", "Alex",
+                             "Brian", "Chris", "Danny", "Evan", "Fred",
+                             "Geoff", "Hank", "Ivan", "Jake", "Kevin",
+                             "Larence", "Mitch", "Nathan", "Oliver", "Patrick",
+                             "Quentin", "Roger", "Sean", "Thomas", "Adrian",
+                             "Billy", "Dorian", "Elliott", "George", "Harry",
+                             "Josh", "Max", "Noah", "Phil", "Rick",
+                             "Sid", "Toby", "Martin", "Aaron", "Hal",
+                             "Steve", "James", "Charles"]);
+    var femaleNames = shuffle(["Anna", "Beth", "Clara", "Danielle", "Emma",
+                               "Fiona", "Gina", "Hillary", "Isabel", "Jessica",
+                               "Kim", "Laura", "Meagan", "Nina", "Patricia",
+                               "Rachel", "Sarah", "Trisha", "Violet", "Abby",
+                               "Briana", "Chloe", "Dana", "Erin", "Gabby",
+                               "Gwen", "Sally", "Becca", "Tanya", "Mia",
+                               "Susan", "Veronica", "Jennifer", "Mary", "Linda",
+                               "Lydia", "Vanessa", "Eliza", "Barbara", "Alyssa",
+                               "Stephanie", "Georgia", "Tina", "Margaret", "Amy"]);
+    var gender = rep("m", maleNames.length).concat(rep("f", femaleNames.length));
+    var objPron = {"m":"him", "f":"her"};
+    var subjPron = {"m":"he", "f":"she"};
+    var purchasers = [];
+    for (var i=0; i<gender.length; i++) {
+      var g = gender[i];
+      if (g == "m") {
+        var purchaserName = maleNames.shift();
+      } else if (g == "f") {
+        var purchaserName = femaleNames.shift();
+      } else {
+        console.log("error1");
+      }
+      purchasers.push({name: purchaserName,
+                       obj: objPron[g],
+                       subj: subjPron[g]});
+    }
+    return(purchasers);
   }
-  return(purchasers);
 }
